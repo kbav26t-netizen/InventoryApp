@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.inventory.app.data.db.entity.InventoryItem
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryScreen() {
     var items by remember { mutableStateOf<List<InventoryItem>>(emptyList()) }
