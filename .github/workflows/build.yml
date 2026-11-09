@@ -19,12 +19,13 @@ jobs:
 
       - name: Download gradle-wrapper.jar
         run: |
-          curl -L -o gradle/wrapper/gradle-wrapper.jar \
-            "https://github.com/gradle/gradle/raw/refs/tags/v8.6.0/gradle/wrapper/gradle-wrapper.jar"
+          curl -L "https://api.github.com/repos/gradle/gradle/contents/gradle/wrapper/gradle-wrapper.jar?ref=v8.6.0" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            -o gradle/wrapper/gradle-wrapper.jar
           SIZE=$(stat -c%s gradle/wrapper/gradle-wrapper.jar)
           echo "Wrapper JAR size: $SIZE bytes"
           if [ "$SIZE" -lt 50000 ]; then
-            echo "ERROR: gradle-wrapper.jar is too small ($SIZE bytes), likely HTML instead of JAR"
+            echo "ERROR: gradle-wrapper.jar is too small ($SIZE bytes)"
             exit 1
           fi
 
