@@ -11,8 +11,8 @@ android {
         applicationId = "com.inventory.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
     }
 
     buildFeatures {
@@ -50,4 +50,7 @@ dependencies {
     
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+    
+    // ML Kit Barcode Scanning
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
 }
