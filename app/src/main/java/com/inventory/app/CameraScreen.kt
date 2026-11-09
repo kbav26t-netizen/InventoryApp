@@ -31,9 +31,9 @@ fun CameraScreen() {
             CameraPreview(
                 onBarcodeDetected = { code ->
                     scannedCode = code
-                }
+                },
+                modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.height(16.dp))
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -51,6 +51,7 @@ fun CameraScreen() {
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
         }
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -63,7 +64,8 @@ fun CameraScreen() {
 
 @Composable
 fun CameraPreview(
-    onBarcodeDetected: (String) -> Unit
+    onBarcodeDetected: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -102,8 +104,6 @@ fun CameraPreview(
 
     AndroidView(
         factory = { previewView },
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)
+        modifier = modifier.fillMaxWidth()
     )
 }
