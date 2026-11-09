@@ -25,11 +25,14 @@ jobs:
       - name: Build APK
         run: gradle assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         if: success()
-        uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 7
-          compression-level: 0
+          tag_name: v${{ github.run_number }}
+          name: Release ${{ github.run_number }}
+          files: app/build/outputs/apk/debug/app-debug.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
