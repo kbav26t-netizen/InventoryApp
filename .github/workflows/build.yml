@@ -17,23 +17,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Download gradle-wrapper.jar
-        run: |
-          curl -L "https://api.github.com/repos/gradle/gradle/contents/gradle/wrapper/gradle-wrapper.jar?ref=v8.6.0" \
-            -H "Accept: application/vnd.github.v3.raw" \
-            -o gradle/wrapper/gradle-wrapper.jar
-          SIZE=$(stat -c%s gradle/wrapper/gradle-wrapper.jar)
-          echo "Wrapper JAR size: $SIZE bytes"
-          if [ "$SIZE" -lt 50000 ]; then
-            echo "ERROR: gradle-wrapper.jar is too small ($SIZE bytes)"
-            exit 1
-          fi
-
-      - name: Make gradlew executable
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.6
 
       - name: Build APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK
         if: success()
