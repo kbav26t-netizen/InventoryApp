@@ -3,14 +3,13 @@ package com.inventory.app
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.mediapipe.framework.image.BitmapImageBuilder
-import com.google.mediapipe.framework.image.MPImage
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.objectdetector.ObjectDetector
 import com.google.mediapipe.tasks.vision.objectdetector.ObjectDetectorResult
 import com.google.mediapipe.tasks.vision.core.RunningMode
 
 class ObjectDetector(
-    context: Context,
+    private val context: Context,
     private val onResult: (ObjectDetectorResult) -> Unit
 ) {
     private var detector: ObjectDetector? = null

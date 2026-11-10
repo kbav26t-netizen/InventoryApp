@@ -25,6 +25,12 @@ jobs:
         with:
           gradle-version: 8.6
 
+      - name: Download ML model
+        run: |
+          mkdir -p app/src/main/assets
+          curl -L -o app/src/main/assets/efficientdet_lite0.tflite "https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float32/1/efficientdet_lite0.tflite"
+          ls -lh app/src/main/assets/
+
       - name: Build APK
         run: gradle assembleDebug --stacktrace
 
