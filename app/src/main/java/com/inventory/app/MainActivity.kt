@@ -49,13 +49,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("counting") {
-                            // Заглушка для следующего шага
-                            androidx.compose.foundation.layout.Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = androidx.compose.ui.Alignment.Center
-                            ) {
-                                androidx.compose.material3.Text("Режим подсчёта объектов (в разработке)")
-                            }
+                            CountingScreen(onBack = { navController.popBackStack() })
                         }
                     }
                 }
