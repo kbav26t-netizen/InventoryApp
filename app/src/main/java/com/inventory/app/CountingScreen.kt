@@ -2,8 +2,13 @@ package com.inventory.app
 
 import android.Manifest
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageFormat
+import android.graphics.Rect
+import android.graphics.YuvImage
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -14,7 +19,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -22,9 +26,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.mediapipe.tasks.vision.objectdetector.ObjectDetectorResult
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.Executors
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CountingScreen(onBack: () -> Unit) {
     val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
@@ -41,15 +47,18 @@ fun CountingScreen(onBack: () -> Unit) {
                     }
                 }
             )
-            
+
             CountingCameraPreview(
-                onObjectsDetected = { objects ->
-                    objectCount = objects.size
-                    lastDetectedObjects = objects
+                onObjectsDetected = { result ->
+                    val categories = result.detections().map { det ->
+                        det.categories().firstOrNull()?.categoryName() ?: "unknown"
+                    }
+                    objectCount = categories.size
+                    lastDetectedObjects = categories
                 },
                 modifier = Modifier.weight(1f)
             )
-            
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -88,7 +97,7 @@ fun CountingScreen(onBack: () -> Unit) {
 
 @Composable
 fun CountingCameraPreview(
-    onObjectsDetected: (List<String>) -> Unit,
+    onObjectsDetected: (ObjectDetectorResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -96,14 +105,19 @@ fun CountingCameraPreview(
     val previewView = remember { PreviewView(context) }
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val analyzerExecutor = remember { Executors.newSingleThreadExecutor() }
-    val detector = remember { ObjectDetector(context) }
+
+    val detector = remember {
+        ObjectDetector(context) { result ->
+            onObjectsDetected(result)
+        }
+    }
 
     DisposableEffect(lifecycleOwner) {
         val cameraProvider = cameraProviderFuture.get()
         val preview = Preview.Builder().build().also {
             it.setSurfaceProvider(previewView.surfaceProvider)
         }
-        
+
         val imageAnalysis = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
@@ -111,17 +125,11 @@ fun CountingCameraPreview(
                 it.setAnalyzer(analyzerExecutor) { imageProxy ->
                     val bitmap = imageProxy.toBitmap()
                     val timestampMs = System.currentTimeMillis()
-                    
-                    // Запускаем детекцию
                     detector.detect(bitmap, timestampMs)
-                    
-                    // Пока просто считаем кадры (реальная детекция будет позже)
-                    onObjectsDetected(emptyList())
-                    
                     imageProxy.close()
                 }
             }
-        
+
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
         try {
             cameraProvider.unbindAll()
@@ -129,7 +137,7 @@ fun CountingCameraPreview(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        
+
         onDispose {
             cameraProvider.unbindAll()
             analyzerExecutor.shutdown()
@@ -141,4 +149,26 @@ fun CountingCameraPreview(
         factory = { previewView },
         modifier = modifier.fillMaxWidth()
     )
+}
+
+fun ImageProxy.toBitmap(): Bitmap {
+    val yBuffer = planes[0].buffer
+    val uBuffer = planes[1].buffer
+    val vBuffer = planes[2].buffer
+
+    val ySize = yBuffer.remaining()
+    val uSize = uBuffer.remaining()
+    val vSize = vBuffer.remaining()
+
+    val nv21 = ByteArray(ySize + uSize + vSize)
+
+    yBuffer.get(nv21, 0, ySize)
+    vBuffer.get(nv21, ySize, vSize)
+    uBuffer.get(nv21, ySize + vSize, uSize)
+
+    val yuvImage = YuvImage(nv21, ImageFormat.NV21, width, height, null)
+    val out = ByteArrayOutputStream()
+    yuvImage.compressToJpeg(Rect(0, 0, width, height), 90, out)
+    val imageBytes = out.toByteArray()
+    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 }
