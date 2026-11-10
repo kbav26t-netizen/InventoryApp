@@ -12,8 +12,8 @@ android {
         applicationId = "com.inventory.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 7
-        versionName = "1.6"
+        versionCode = 8
+        versionName = "1.7"
     }
 
     buildFeatures {
@@ -58,6 +58,9 @@ dependencies {
     
     // ML Kit Barcode Scanning
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    
+    // MediaPipe Object Detection
+    implementation("com.google.mediapipe:tasks-vision:0.10.14")
     
     // Room Database
     val roomVersion = "2.6.0"
