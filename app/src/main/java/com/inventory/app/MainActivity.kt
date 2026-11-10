@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.inventory.app.presentation.HistoryScreen
+import com.inventory.app.presentation.ModeSelectionScreen
 import com.inventory.app.viewmodel.ScanViewModel
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +27,13 @@ class MainActivity : ComponentActivity() {
                     val viewModel: ScanViewModel = viewModel()
                     val scans by viewModel.allScans.collectAsState()
 
-                    NavHost(navController = navController, startDestination = "camera") {
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable("home") {
+                            ModeSelectionScreen(
+                                onBarcodeModeClick = { navController.navigate("camera") },
+                                onCountingModeClick = { navController.navigate("counting") }
+                            )
+                        }
                         composable("camera") {
                             CameraScreen(
                                 viewModel = viewModel,
@@ -40,6 +47,15 @@ class MainActivity : ComponentActivity() {
                                 onClearAll = { viewModel.clearAll() },
                                 onBack = { navController.popBackStack() }
                             )
+                        }
+                        composable("counting") {
+                            // Заглушка для следующего шага
+                            androidx.compose.foundation.layout.Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = androidx.compose.ui.Alignment.Center
+                            ) {
+                                androidx.compose.material3.Text("Режим подсчёта объектов (в разработке)")
+                            }
                         }
                     }
                 }
