@@ -23,7 +23,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.inventory.app.viewmodel.ScanViewModel
 import java.util.concurrent.Executors
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CameraScreen(
     viewModel: ScanViewModel,
