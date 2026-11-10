@@ -3,6 +3,7 @@ package com.inventory.app
 import android.content.Context
 import android.graphics.Bitmap
 import com.google.mediapipe.framework.image.BitmapImageBuilder
+import com.google.mediapipe.framework.image.MPImage
 import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.objectdetector.ObjectDetector
 import com.google.mediapipe.tasks.vision.objectdetector.ObjectDetectorResult
@@ -24,7 +25,7 @@ class ObjectDetector(
                 .setBaseOptions(baseOptions)
                 .setRunningMode(RunningMode.LIVE_STREAM)
                 .setMaxResults(20)
-                .setResultListener { result -> onResult(result) }
+                .setResultListener { result, _ -> onResult(result) }
                 .setErrorListener { error -> error.printStackTrace() }
                 .build()
 
