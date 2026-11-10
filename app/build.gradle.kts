@@ -43,6 +43,18 @@ android {
     }
 }
 
+// Правильная нумерация версий для каждого ABI
+ext.abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2, "x86": 3, "x86_64": 4]
+
+android.applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+        def abiName = output.getFilter(com.android.build.OutputFile.ABI)
+        if (abiName != null) {
+            output.versionCodeOverride = project.ext.abiCodes.get(abiName, 0) * 1000 + android.defaultConfig.versionCode
+        }
+    }
+}
+
 dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2023.10.01")
     implementation(composeBom)
