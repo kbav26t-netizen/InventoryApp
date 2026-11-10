@@ -12,8 +12,8 @@ android {
         applicationId = "com.inventory.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.5"
+        versionCode = 7
+        versionName = "1.6"
     }
 
     buildFeatures {
@@ -58,11 +58,6 @@ dependencies {
     
     // ML Kit Barcode Scanning
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
-    
-    // TensorFlow Lite (для YOLOv8-nano)
-    implementation("org.tensorflow:tensorflow-lite:2.14.0")
-    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
-    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
     
     // Room Database
     val roomVersion = "2.6.0"
