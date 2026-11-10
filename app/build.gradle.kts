@@ -12,8 +12,8 @@ android {
         applicationId = "com.inventory.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 10
-        versionName = "1.9"
+        versionCode = 11
+        versionName = "2.0"
     }
 
     splits {
@@ -40,18 +40,6 @@ android {
 
     kotlinOptions {
         jvmTarget = "17"
-    }
-}
-
-// Правильная нумерация версий для каждого ABI
-ext.abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2, "x86": 3, "x86_64": 4]
-
-android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-        def abiName = output.getFilter(com.android.build.OutputFile.ABI)
-        if (abiName != null) {
-            output.versionCodeOverride = project.ext.abiCodes.get(abiName, 0) * 1000 + android.defaultConfig.versionCode
-        }
     }
 }
 
